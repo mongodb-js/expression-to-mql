@@ -1,0 +1,7 @@
+require:
+  - '@babel/register'
+  - 'regenerator-runtime/runtime'
+reporter: spec
+spec: '**/*.spec.js'
+ignore:
+  - node_modules

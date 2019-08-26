@@ -1,0 +1,33 @@
+{
+  "name": "expression-to-mql",
+  "version": "0.1.0",
+  "description": "parse mathematical expressions and convert them to MongoDB aggregation expressions",
+  "main": "index.js",
+  "module": "*** TODO path/to/src/entrypoint TODO ***",
+  "scripts": {
+    "fmt": "prettier --write '**/*.{js,md}'",
+    "check": "prettier --check '**/*.{js,md}'",
+    "test": "mocha",
+    "build": "rimraf dist/ && babel ./src --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
+    "start": "npm run build && node dist/index.js"
+  },
+  "author": "Thomas Rueckstiess (thomas@mongodb.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "chai": "^4.2.0",
+    "eslint": "^4.7.0",
+    "prettier": "^1.18.2",
+    "rimraf": "^2.6.2"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "dependencies": {
+    "@babel/register": "^7.5.5",
+    "jsep": "^0.3.4",
+    "lodash": "^4.17.15",
+    "mocha": "^6.2.0",
+    "regenerator-runtime": "^0.13.3"
+  }
+}
