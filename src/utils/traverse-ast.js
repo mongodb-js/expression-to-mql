@@ -6,19 +6,18 @@ const DEFAULT_TRAVERSAL_MODE = 'infix';
 
 /**
  * tree traversal generator function. Given an AST (jsep format),
- * traverses the tree in pre-, in- or postfix mode and yields
- * for each node. Children are referenced with "left" and "right"
- * properties.
+ * traverses the tree in prefix, infix or postfix mode and yields
+ * for each node.
  *
- * @param  {Object}    root            an AST object as returned by jsep.
- * @param  {String}    traversalMode   one of 'prefix', 'infix', 'postfix'.
- *                                     determines if the root node is yielded
- *                                     before, in between or after its children.
- *                                     default is 'infix'.
- * @return {Generator}                 returns a generator which yields
- *                                     each node object in the given order.
+ * @param  {Object}    root             an AST object as returned by jsep.
+ * @param  {String}    traversalMode    one of 'prefix', 'infix', 'postfix'.
+ *                                      determines if the root node is yielded
+ *                                      before, in between or after its children.
+ *                                      default is 'infix'.
+ * @return {Generator}                  returns a generator which yields
+ *                                      each node object in the given order.
  */
-function* traverseAST(root, traversalMode = DEFAULT_TRAVERSAL_MODE) {
+function* traverseAST(root, { traversalMode = DEFAULT_TRAVERSAL_MODE } = {}) {
   // validate traversal mode
   if (!TRAVERSAL_MODES.includes(traversalMode)) {
     throw new Error(
@@ -39,25 +38,78 @@ function* traverseAST(root, traversalMode = DEFAULT_TRAVERSAL_MODE) {
     return;
   }
 
-  function* recursiveTraversal(node) {
+  function* binaryTraversal(node) {
     if (traversalMode === 'prefix') {
       yield node;
     }
     if (node.left) {
-      yield* recursiveTraversal(node.left);
+      yield* traversal(node.left);
     }
     if (traversalMode === 'infix') {
       yield node;
     }
     if (node.right) {
-      yield* recursiveTraversal(node.right);
+      yield* traversal(node.right);
     }
     if (traversalMode === 'postfix') {
       yield node;
     }
   }
 
-  yield* recursiveTraversal(root);
+  function* unaryTraversal(node, { childLabel = 'argument' } = {}) {
+    if (traversalMode === 'postfix') {
+      yield* traversal(node[childLabel]);
+      yield node;
+    } else {
+      yield node;
+      yield* traversal(node[childLabel]);
+    }
+  }
+
+  /**
+   * traverse a MemberExpression by recursively collapsing all child
+   * MemberExpressions and reconstructing the dotted field path.
+   *
+   * @param  {Object}    node   node with type MemberExpression
+   * @return {Generator}        node with type Identifier and name as the
+   *                            dotted field path, e.g.
+   *                            {'type': 'Identifier', 'name': 'foo.bar.baz'}
+   */
+  function* memberTraversal(node) {
+    const front = traversal(node.object).next().value;
+    const last = node.property;
+    node.type = 'Identifier';
+    node.name = `${front.name}.${last.name}`;
+    delete node.object;
+    delete node.property;
+    delete node.computed;
+    yield node;
+  }
+
+  /**
+   * generic traversal method which acts as a switch depending on node type.
+   *
+   * @param  {Object}    node  the parent node to traverse
+   * @return {Generator}       yields the parent and children nodes, the order
+   *                           depends on the traversalMode.
+   */
+  function* traversal(node) {
+    switch (node.type) {
+      case 'BinaryExpression':
+        yield* binaryTraversal(node);
+        break;
+      case 'MemberExpression':
+        yield* memberTraversal(node);
+        break;
+      case 'UnaryExpression':
+        yield* unaryTraversal(node);
+        break;
+      default:
+        yield node;
+    }
+  }
+
+  yield* traversal(root);
 }
 
 export default traverseAST;
