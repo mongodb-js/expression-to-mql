@@ -56,13 +56,22 @@ function* traverseAST(root, { traversalMode = DEFAULT_TRAVERSAL_MODE } = {}) {
     }
   }
 
-  function* unaryTraversal(node, { childLabel = 'argument' } = {}) {
+  /**
+   * traverse a UnaryExpression (e.g. -4). In postfix traversalMode, it will
+   * yield the argument first, then the operator. In prefix and infix mode,
+   * it will yield the operator first, then the argument.
+   *
+   * @param  {Object}    node      node with type UnaryExpression
+   * @return {Generator}           yields the operator and argument, the order
+   *                               depends on traversalMode.
+   */
+  function* unaryTraversal(node) {
     if (traversalMode === 'postfix') {
-      yield* traversal(node[childLabel]);
+      yield* traversal(node.argument);
       yield node;
     } else {
       yield node;
-      yield* traversal(node[childLabel]);
+      yield* traversal(node.argument);
     }
   }
 
