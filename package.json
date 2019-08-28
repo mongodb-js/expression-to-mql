@@ -2,8 +2,8 @@
   "name": "expression-to-mql",
   "version": "0.1.0",
   "description": "parse arithmetic expressions and convert them to MongoDB aggregation expressions",
-  "main": "index.js",
-  "module": "*** TODO path/to/src/entrypoint TODO ***",
+  "main": "./dist/index.js",
+  "module": "./src/index.js",
   "bin": {
     "expr2mql": "./bin/expr2mql.js"
   },
