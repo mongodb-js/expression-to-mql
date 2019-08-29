@@ -2,9 +2,26 @@ import exprToMQL from './expr-to-mql';
 import { expect } from 'chai';
 
 describe('exprToMQL', function() {
-  it('works for literals', function() {
+  it('works for numeric literals', function() {
     const mql = exprToMQL('1 + 2');
     expect(mql).to.be.deep.equal({ $sum: [1, 2] });
+  });
+  it('flattens repeated unary operators', function() {
+    const mql = exprToMQL('--1 - --1');
+    expect(mql).to.be.deep.equal({ $subtract: [1, 1] });
+  });
+  it('works for string literals', function() {
+    const mql = exprToMQL('"field" + "other"');
+    expect(mql).to.be.deep.equal({ $sum: ['$field', '$other'] });
+  });
+  it('works for string literals with spaces', function() {
+    const mql = exprToMQL('"some field" / 2');
+    expect(mql).to.be.deep.equal({ $divide: ['$some field', 2] });
+  });
+  it('throws for invalid literal types', function() {
+    expect(exprToMQL.bind(null, '3 + false')).to.throw(
+      /Invalid literal type "boolean"/
+    );
   });
   it('works for identifiers', function() {
     const mql = exprToMQL('var1 + var2');
@@ -37,13 +54,24 @@ describe('exprToMQL', function() {
       { input: '1', output: 1 },
       { input: '+1', output: 1 },
       { input: '-1', output: -1 },
-      { input: '--1', output: { $multiply: [-1, -1] } },
+      { input: '--1', output: 1 },
+      { input: '---1', output: -1 },
+      { input: '----1', output: 1 },
       { input: '++++++1', output: 1 },
       { input: 'foo', output: '$foo' },
       { input: '+foo', output: '$foo' },
       { input: '-foo', output: { $multiply: [-1, '$foo'] } },
       { input: 'foo.bar', output: '$foo.bar' },
       { input: '-foo.bar', output: { $multiply: [-1, '$foo.bar'] } },
+      { input: '-"foo bar"', output: { $multiply: [-1, '$foo bar'] } },
+      {
+        input: 'foo--bar',
+        output: { $subtract: ['$foo', { $multiply: [-1, '$bar'] }] }
+      },
+      {
+        input: '"foo"--"bar"',
+        output: { $subtract: ['$foo', { $multiply: [-1, '$bar'] }] }
+      },
       { input: '1 + 2', output: { $sum: [1, 2] } },
       { input: '1 / foo', output: { $divide: [1, '$foo'] } },
       {

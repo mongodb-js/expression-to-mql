@@ -10,6 +10,8 @@ var _jsep = _interopRequireDefault(require("jsep"));
 
 var _validateAst = _interopRequireDefault(require("./utils/validate-ast"));
 
+var _lodash = require("lodash");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -34,8 +36,14 @@ var unaryExpressionFn = function unaryExpressionFn(node) {
   } // for literals, we can return the negative value
 
 
-  if (node.argument.type === 'Literal') {
+  if (node.argument.type === 'Literal' && (0, _lodash.isNumber)(node.argument.value)) {
     return -node.argument.value;
+  } // flatten nested unary expressions
+
+
+  if (node.argument.type === 'UnaryExpression') {
+    node.argument.operator = node.argument.operator === '+' ? '-' : '+';
+    return mapNodeToMQL(node.argument);
   } // for everything else, multiply with -1 in the agg framework
 
 
@@ -46,7 +54,7 @@ var unaryExpressionFn = function unaryExpressionFn(node) {
 
 
 var literalExpressionFn = function literalExpressionFn(node) {
-  return node.value;
+  return (0, _lodash.isNumber)(node.value) ? node.value : "$".concat(node.value);
 }; // expression builder function for Identifier nodes
 
 

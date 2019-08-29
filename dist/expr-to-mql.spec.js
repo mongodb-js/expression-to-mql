@@ -7,11 +7,32 @@ var _chai = require("chai");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 describe('exprToMQL', function () {
-  it('works for literals', function () {
+  it('works for numeric literals', function () {
     var mql = (0, _exprToMql.default)('1 + 2');
     (0, _chai.expect)(mql).to.be.deep.equal({
       $sum: [1, 2]
     });
+  });
+  it('flattens repeated unary operators', function () {
+    var mql = (0, _exprToMql.default)('--1 - --1');
+    (0, _chai.expect)(mql).to.be.deep.equal({
+      $subtract: [1, 1]
+    });
+  });
+  it('works for string literals', function () {
+    var mql = (0, _exprToMql.default)('"field" + "other"');
+    (0, _chai.expect)(mql).to.be.deep.equal({
+      $sum: ['$field', '$other']
+    });
+  });
+  it('works for string literals with spaces', function () {
+    var mql = (0, _exprToMql.default)('"some field" / 2');
+    (0, _chai.expect)(mql).to.be.deep.equal({
+      $divide: ['$some field', 2]
+    });
+  });
+  it('throws for invalid literal types', function () {
+    (0, _chai.expect)(_exprToMql.default.bind(null, '3 + false')).to.throw(/Invalid literal type "boolean"/);
   });
   it('works for identifiers', function () {
     var mql = (0, _exprToMql.default)('var1 + var2');
@@ -57,9 +78,13 @@ describe('exprToMQL', function () {
       output: -1
     }, {
       input: '--1',
-      output: {
-        $multiply: [-1, -1]
-      }
+      output: 1
+    }, {
+      input: '---1',
+      output: -1
+    }, {
+      input: '----1',
+      output: 1
     }, {
       input: '++++++1',
       output: 1
@@ -81,6 +106,25 @@ describe('exprToMQL', function () {
       input: '-foo.bar',
       output: {
         $multiply: [-1, '$foo.bar']
+      }
+    }, {
+      input: '-"foo bar"',
+      output: {
+        $multiply: [-1, '$foo bar']
+      }
+    }, {
+      input: 'foo--bar',
+      output: {
+        $subtract: ['$foo', {
+          $multiply: [-1, '$bar']
+        }]
+      }
+    }, {
+      input: '"foo"--"bar"',
+      output: {
+        $subtract: ['$foo', {
+          $multiply: [-1, '$bar']
+        }]
       }
     }, {
       input: '1 + 2',

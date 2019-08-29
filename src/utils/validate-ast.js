@@ -1,6 +1,9 @@
 import traverseAST from './traverse-ast';
 import { notOneOfSetError } from './error-msg';
 
+const DEFAULT_ALLOWED_LITERAL_TYPES = ['number', 'string'];
+const DEFAULT_ALLOWED_BINARY_OPERATORS = ['+', '-', '*', '/'];
+const DEFAULT_ALLOWED_UNARY_OPERATORS = ['+', '-'];
 const DEFAULT_ALLOWED_NODE_TYPES = [
   'BinaryExpression',
   'UnaryExpression',
@@ -9,13 +12,11 @@ const DEFAULT_ALLOWED_NODE_TYPES = [
   'Literal'
 ];
 
-const DEFAULT_ALLOWED_BINARY_OPERATORS = ['+', '-', '*', '/'];
-const DEFAULT_ALLOWED_UNARY_OPERATORS = ['+', '-'];
-
 function validateAST(
   ast,
   {
     allowedNodeTypes = DEFAULT_ALLOWED_NODE_TYPES,
+    allowedLiteralTypes = DEFAULT_ALLOWED_LITERAL_TYPES,
     allowedUnaryOperators = DEFAULT_ALLOWED_UNARY_OPERATORS,
     allowedBinaryOperators = DEFAULT_ALLOWED_BINARY_OPERATORS
   } = {}
@@ -49,6 +50,15 @@ function validateAST(
               node.operator,
               allowedUnaryOperators
             )
+          );
+        }
+      }
+      // for Literal node types, only allow whitelisted types
+      if (node.type === 'Literal') {
+        const type = typeof node.value;
+        if (!allowedLiteralTypes.includes(type)) {
+          throw new Error(
+            notOneOfSetError('literal type', type, allowedLiteralTypes)
           );
         }
       }

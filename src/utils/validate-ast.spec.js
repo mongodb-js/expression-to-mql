@@ -96,4 +96,36 @@ describe('Validate AST', function() {
       });
     });
   });
+  describe('Literal Types', function() {
+    context('with default literal types', function() {
+      it('validates correctly when the AST only includes valid literal types', function() {
+        const tree = jsep('"bar" + 9.4 - "foo" + 16.111');
+        expect(validateAST.bind(null, tree)).to.not.throw();
+      });
+      it('throws when the AST includes invalid literal types', function() {
+        const tree = jsep('"bar" + true - null + undefined');
+        expect(validateAST.bind(null, tree)).to.throw(
+          /Invalid literal type "boolean"/
+        );
+      });
+    });
+    context('with custom literal types', function() {
+      it('validates correctly when the AST only includes valid literal types', function() {
+        const tree = jsep('13 + true + 16.111');
+        expect(
+          validateAST.bind(null, tree, {
+            allowedLiteralTypes: ['boolean', 'number']
+          })
+        ).to.not.throw();
+      });
+      it('throws when the AST includes invalid literal types', function() {
+        const tree = jsep('"bar" + true / 16');
+        expect(
+          validateAST.bind(null, tree, {
+            allowedLiteralTypes: ['boolean', 'number']
+          })
+        ).to.throw(/Invalid literal type "string"/);
+      });
+    });
+  });
 });

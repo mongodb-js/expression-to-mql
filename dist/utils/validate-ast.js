@@ -11,14 +11,19 @@ var _errorMsg = require("./error-msg");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DEFAULT_ALLOWED_NODE_TYPES = ['BinaryExpression', 'UnaryExpression', 'MemberExpression', 'Identifier', 'Literal'];
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var DEFAULT_ALLOWED_LITERAL_TYPES = ['number', 'string'];
 var DEFAULT_ALLOWED_BINARY_OPERATORS = ['+', '-', '*', '/'];
 var DEFAULT_ALLOWED_UNARY_OPERATORS = ['+', '-'];
+var DEFAULT_ALLOWED_NODE_TYPES = ['BinaryExpression', 'UnaryExpression', 'MemberExpression', 'Identifier', 'Literal'];
 
 function validateAST(ast) {
   var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
       _ref$allowedNodeTypes = _ref.allowedNodeTypes,
       allowedNodeTypes = _ref$allowedNodeTypes === void 0 ? DEFAULT_ALLOWED_NODE_TYPES : _ref$allowedNodeTypes,
+      _ref$allowedLiteralTy = _ref.allowedLiteralTypes,
+      allowedLiteralTypes = _ref$allowedLiteralTy === void 0 ? DEFAULT_ALLOWED_LITERAL_TYPES : _ref$allowedLiteralTy,
       _ref$allowedUnaryOper = _ref.allowedUnaryOperators,
       allowedUnaryOperators = _ref$allowedUnaryOper === void 0 ? DEFAULT_ALLOWED_UNARY_OPERATORS : _ref$allowedUnaryOper,
       _ref$allowedBinaryOpe = _ref.allowedBinaryOperators,
@@ -42,6 +47,15 @@ function validateAST(ast) {
       if (node.type === 'UnaryExpression') {
         if (!allowedUnaryOperators.includes(node.operator)) {
           throw new Error((0, _errorMsg.notOneOfSetError)('unary expression operator', node.operator, allowedUnaryOperators));
+        }
+      } // for Literal node types, only allow whitelisted types
+
+
+      if (node.type === 'Literal') {
+        var type = _typeof(node.value);
+
+        if (!allowedLiteralTypes.includes(type)) {
+          throw new Error((0, _errorMsg.notOneOfSetError)('literal type', type, allowedLiteralTypes));
         }
       }
     });

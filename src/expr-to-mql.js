@@ -1,5 +1,6 @@
 import jsep from 'jsep';
 import validateAST from './utils/validate-ast';
+import { isNumber } from 'lodash';
 
 // maps binary expression operators to their respective agg operators
 const BINARY_OPERATOR_MAP = {
@@ -24,15 +25,21 @@ const unaryExpressionFn = node => {
     return mapNodeToMQL(node.argument);
   }
   // for literals, we can return the negative value
-  if (node.argument.type === 'Literal') {
+  if (node.argument.type === 'Literal' && isNumber(node.argument.value)) {
     return -node.argument.value;
+  }
+  // flatten nested unary expressions
+  if (node.argument.type === 'UnaryExpression') {
+    node.argument.operator = node.argument.operator === '+' ? '-' : '+';
+    return mapNodeToMQL(node.argument);
   }
   // for everything else, multiply with -1 in the agg framework
   return { $multiply: [-1, mapNodeToMQL(node.argument)] };
 };
 
 // expression builder function for Literal nodes
-const literalExpressionFn = node => node.value;
+const literalExpressionFn = node =>
+  isNumber(node.value) ? node.value : `$${node.value}`;
 
 // expression builder function for Identifier nodes
 const identifierExpressionFn = node => `$${node.name}`;
