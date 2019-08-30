@@ -28,6 +28,7 @@
   },
   "browserslist": "> 0.25%, not dead",
   "dependencies": {
+    "core-js": "^3.2.1",
     "docopt": "^0.6.2",
     "jsep": "^0.3.4",
     "lodash": "^4.17.15",
