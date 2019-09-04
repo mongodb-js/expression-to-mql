@@ -9,7 +9,7 @@
     ]
   ],
   "env": {
-    "mjs": {
+    "esm": {
       "presets": [
         [
           "@babel/env",

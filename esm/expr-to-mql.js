@@ -1,26 +1,12 @@
-"use strict";
-
-require("core-js/modules/es.function.name");
-
-require("core-js/modules/es.object.define-property");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.exprToMQL = exprToMQL;
-exports.default = void 0;
-
-var _jsep = _interopRequireDefault(require("jsep"));
-
-var _validateAst = _interopRequireDefault(require("./utils/validate-ast"));
-
-var _lodash = require("lodash");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+import "core-js/modules/es.function.name";
+import "core-js/modules/es.object.define-property";
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-// maps binary expression operators to their respective agg operators
+import jsep from 'jsep';
+import validateAST from './utils/validate-ast';
+import { isNumber } from 'lodash'; // maps binary expression operators to their respective agg operators
+
 var BINARY_OPERATOR_MAP = {
   '+': '$sum',
   '-': '$subtract',
@@ -40,7 +26,7 @@ var unaryExpressionFn = function unaryExpressionFn(node) {
   } // for literals, we can return the negative value
 
 
-  if (node.argument.type === 'Literal' && (0, _lodash.isNumber)(node.argument.value)) {
+  if (node.argument.type === 'Literal' && isNumber(node.argument.value)) {
     return -node.argument.value;
   } // flatten nested unary expressions
 
@@ -58,7 +44,7 @@ var unaryExpressionFn = function unaryExpressionFn(node) {
 
 
 var literalExpressionFn = function literalExpressionFn(node) {
-  return (0, _lodash.isNumber)(node.value) ? node.value : "$".concat(node.value);
+  return isNumber(node.value) ? node.value : "$".concat(node.value);
 }; // expression builder function for Identifier nodes
 
 
@@ -95,12 +81,12 @@ var mapNodeToMQL = function mapNodeToMQL(node) {
 
 function exprToMQL(expr) {
   // parse expression into AST
-  var ast = (0, _jsep.default)(expr); // throws if expression is not valid
+  var ast = jsep(expr); // throws if expression is not valid
 
-  (0, _validateAst.default)(ast); // recursively map the AST to MQL syntax
+  validateAST(ast); // recursively map the AST to MQL syntax
 
   return mapNodeToMQL(ast);
 }
 
-var _default = exprToMQL;
-exports.default = _default;
+export default exprToMQL;
+export { exprToMQL };

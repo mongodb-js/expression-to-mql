@@ -1,36 +1,18 @@
-"use strict";
-
-require("core-js/modules/es.array.concat");
-
-require("core-js/modules/es.array.includes");
-
-require("core-js/modules/es.array.iterator");
-
-require("core-js/modules/es.function.name");
-
-require("core-js/modules/es.object.define-property");
-
-require("core-js/modules/es.string.iterator");
-
-require("core-js/modules/web.dom-collections.iterator");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.TRAVERSAL_MODES = exports.default = void 0;
-
-require("regenerator-runtime/runtime");
-
-var _lodash = require("lodash");
-
-var _errorMsg = require("./error-msg");
+import "core-js/modules/es.array.concat";
+import "core-js/modules/es.array.includes";
+import "core-js/modules/es.array.iterator";
+import "core-js/modules/es.function.name";
+import "core-js/modules/es.string.iterator";
+import "core-js/modules/web.dom-collections.iterator";
+import "regenerator-runtime/runtime";
 
 var _marked5 =
 /*#__PURE__*/
 regeneratorRuntime.mark(traverseAST);
 
+import { isArray, isEmpty } from 'lodash';
+import { notOneOfSetError, missingProperty } from './error-msg';
 var TRAVERSAL_MODES = ['prefix', 'infix', 'postfix'];
-exports.TRAVERSAL_MODES = TRAVERSAL_MODES;
 var DEFAULT_TRAVERSAL_MODE = 'infix';
 /**
  * tree traversal generator function. Given an AST (jsep format),
@@ -233,7 +215,7 @@ function traverseAST(root) {
             break;
           }
 
-          throw new Error((0, _errorMsg.notOneOfSetError)('traversal mode', traversalMode, TRAVERSAL_MODES));
+          throw new Error(notOneOfSetError('traversal mode', traversalMode, TRAVERSAL_MODES));
 
         case 8:
           if (root) {
@@ -249,10 +231,10 @@ function traverseAST(root) {
             break;
           }
 
-          throw new Error((0, _errorMsg.missingProperty)('tree', 'type'));
+          throw new Error(missingProperty('tree', 'type'));
 
         case 12:
-          if (!(root.type === 'Compound' && (0, _lodash.isArray)(root.body) && (0, _lodash.isEmpty)(root.body))) {
+          if (!(root.type === 'Compound' && isArray(root.body) && isEmpty(root.body))) {
             _context5.next = 14;
             break;
           }
@@ -270,5 +252,5 @@ function traverseAST(root) {
   }, _marked5);
 }
 
-var _default = traverseAST;
-exports.default = _default;
+export default traverseAST;
+export { TRAVERSAL_MODES };
