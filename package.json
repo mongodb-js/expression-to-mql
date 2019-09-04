@@ -2,17 +2,22 @@
   "name": "expression-to-mql",
   "version": "0.1.0",
   "description": "parse arithmetic expressions and convert them to MongoDB aggregation expressions",
-  "main": "./dist/index.js",
-  "module": "./src/index.js",
+  "main": "lib/",
+  "module": "esm/",
   "bin": {
     "expr2mql": "./bin/expr2mql.js"
   },
   "scripts": {
     "fmt": "prettier --write '**/*.{js,md}'",
     "check": "prettier --check '**/*.{js,md}'",
-    "test": "mocha",
-    "build": "rimraf dist/ && babel ./src --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
-    "start": "npm run build && node dist/index.js"
+    "test": "mocha test/",
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "babel --delete-dir-on-start --env-name esm -d esm/ src/",
+    "build:cjs": "babel --delete-dir-on-start --env-name cjs -d lib/ src/",
+    "start": "npm run build && node dist/index.js",
+    "clean": "rimraf lib && rimraf esm",
+    "preversion": "npm test",
+    "prepublishOnly": "npm run build"
   },
   "author": "Thomas Rueckstiess (thomas@mongodb.com)",
   "license": "MIT",

@@ -1,4 +1,4 @@
-import validateAST from './validate-ast';
+import validateAST from '../src/utils/validate-ast';
 import { expect } from 'chai';
 import jsep from 'jsep';
 

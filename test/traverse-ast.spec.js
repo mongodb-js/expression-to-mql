@@ -1,4 +1,4 @@
-import traverseAST, { TRAVERSAL_MODES } from './traverse-ast';
+import traverseAST, { TRAVERSAL_MODES } from '../src/utils/traverse-ast';
 import { expect } from 'chai';
 import jsep from 'jsep';
 import { map } from 'lodash';

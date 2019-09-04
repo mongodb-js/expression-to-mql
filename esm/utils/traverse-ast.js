@@ -1,9 +1,25 @@
 "use strict";
 
+require("core-js/modules/es.array.concat");
+
+require("core-js/modules/es.array.includes");
+
+require("core-js/modules/es.array.iterator");
+
+require("core-js/modules/es.function.name");
+
+require("core-js/modules/es.object.define-property");
+
+require("core-js/modules/es.string.iterator");
+
+require("core-js/modules/web.dom-collections.iterator");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.TRAVERSAL_MODES = exports.default = void 0;
+
+require("regenerator-runtime/runtime");
 
 var _lodash = require("lodash");
 

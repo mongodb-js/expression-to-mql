@@ -1,4 +1,4 @@
-import exprToMQL from './expr-to-mql';
+import exprToMQL from '../src/expr-to-mql';
 import { expect } from 'chai';
 
 describe('exprToMQL', function() {
