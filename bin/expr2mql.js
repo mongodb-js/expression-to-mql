@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var exprToMQL = require('../dist').default;
+var exprToMQL = require('../lib').default;
 const docopt = require('docopt');
 const packageJson = require('../package.json');
 
