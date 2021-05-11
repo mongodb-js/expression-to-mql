@@ -1,6 +1,6 @@
 {
   "name": "expression-to-mql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "parse arithmetic expressions and convert them to MongoDB aggregation expressions",
   "main": "lib/",
   "module": "esm/",
