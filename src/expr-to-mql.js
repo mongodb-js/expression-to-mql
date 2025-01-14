@@ -26,7 +26,7 @@ const unaryExpressionFn = node => {
   }
   // for literals, we can return the negative value
   if (node.argument.type === 'Literal' && isNumber(node.argument.value)) {
-    return -node.argument.value;
+    return { $literal: -node.argument.value };
   }
   // flatten nested unary expressions
   if (node.argument.type === 'UnaryExpression') {
@@ -34,12 +34,13 @@ const unaryExpressionFn = node => {
     return mapNodeToMQL(node.argument);
   }
   // for everything else, multiply with -1 in the agg framework
-  return { $multiply: [-1, mapNodeToMQL(node.argument)] };
+  return { $multiply: [{ $literal: -1 }, mapNodeToMQL(node.argument)] };
 };
 
 // expression builder function for Literal nodes
 const literalExpressionFn = node =>
-  isNumber(node.value) ? node.value : `$${node.value}`;
+  // return numbers within a `$literal` stage
+  isNumber(node.value) ? { $literal: node.value } : `$${node.value}`;
 
 // expression builder function for Identifier nodes
 const identifierExpressionFn = node => `$${node.name}`;
