@@ -27,7 +27,9 @@ var unaryExpressionFn = function unaryExpressionFn(node) {
 
 
   if (node.argument.type === 'Literal' && isNumber(node.argument.value)) {
-    return -node.argument.value;
+    return {
+      $literal: -node.argument.value
+    };
   } // flatten nested unary expressions
 
 
@@ -38,13 +40,19 @@ var unaryExpressionFn = function unaryExpressionFn(node) {
 
 
   return {
-    $multiply: [-1, mapNodeToMQL(node.argument)]
+    $multiply: [{
+      $literal: -1
+    }, mapNodeToMQL(node.argument)]
   };
 }; // expression builder function for Literal nodes
 
 
 var literalExpressionFn = function literalExpressionFn(node) {
-  return isNumber(node.value) ? node.value : "$".concat(node.value);
+  return (// return numbers within a `$literal` stage
+    isNumber(node.value) ? {
+      $literal: node.value
+    } : "$".concat(node.value)
+  );
 }; // expression builder function for Identifier nodes
 
 

@@ -48,5 +48,5 @@ console.log( JSON.stringify(mql) );
 This would output
 
 ```
-{"$sum":["$foo",1]}
+{"$sum": ["$foo", {$literal: 1}]}
 ```

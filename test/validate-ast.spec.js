@@ -9,6 +9,7 @@ describe('Validate AST', function() {
         const tree = jsep('foo + (16.3 * bar)');
         expect(validateAST.bind(null, tree)).to.not.throw();
       });
+
       it('throws when the AST includes an invalid node type', function() {
         const tree = jsep('round(16.334)');
         expect(validateAST.bind(null, tree)).to.throw(
@@ -16,6 +17,7 @@ describe('Validate AST', function() {
         );
       });
     });
+
     context('with custom node types', function() {
       it('validates correctly when the AST only includes valid node types', function() {
         const tree = jsep('1 - 3 * 5 + 9');
@@ -37,12 +39,14 @@ describe('Validate AST', function() {
       });
     });
   });
+
   describe('Binary Operators', function() {
     context('with default binary operators', function() {
       it('validates correctly when the AST only includes valid binary operators', function() {
         const tree = jsep('1 + 2 - 3 / 4 * 5');
         expect(validateAST.bind(null, tree)).to.not.throw();
       });
+
       it('throws when the AST includes an invalid binary operator', function() {
         const tree = jsep('1 + 2 - 3 ^ 4 * 5');
         expect(validateAST.bind(null, tree)).to.throw(
@@ -50,6 +54,7 @@ describe('Validate AST', function() {
         );
       });
     });
+
     context('with custom binary operators', function() {
       it('validates correctly when the AST only includes valid binary operators', function() {
         const tree = jsep('1 + 2 ^ 3 + 4');
@@ -59,6 +64,7 @@ describe('Validate AST', function() {
           })
         ).to.not.throw();
       });
+
       it('throws when the AST includes an invalid binary operator', function() {
         const tree = jsep('1 + 2 - 3 ^ 4 * 5');
         expect(
@@ -77,6 +83,7 @@ describe('Validate AST', function() {
         expect(validateAST.bind(null, tree)).to.not.throw();
       });
     });
+
     context('with custom unary operators', function() {
       it('validates correctly when the AST only includes valid unary operators', function() {
         const tree = jsep('-foo + (-bar)');
@@ -86,6 +93,7 @@ describe('Validate AST', function() {
           })
         ).to.not.throw();
       });
+
       it('throws when the AST includes an invalid unary operator', function() {
         const tree = jsep('-foo + (+bar)');
         expect(
@@ -96,12 +104,14 @@ describe('Validate AST', function() {
       });
     });
   });
+
   describe('Literal Types', function() {
     context('with default literal types', function() {
       it('validates correctly when the AST only includes valid literal types', function() {
         const tree = jsep('"bar" + 9.4 - "foo" + 16.111');
         expect(validateAST.bind(null, tree)).to.not.throw();
       });
+
       it('throws when the AST includes invalid literal types', function() {
         const tree = jsep('"bar" + true - null + undefined');
         expect(validateAST.bind(null, tree)).to.throw(
@@ -109,6 +119,7 @@ describe('Validate AST', function() {
         );
       });
     });
+
     context('with custom literal types', function() {
       it('validates correctly when the AST only includes valid literal types', function() {
         const tree = jsep('13 + true + 16.111');
@@ -118,6 +129,7 @@ describe('Validate AST', function() {
           })
         ).to.not.throw();
       });
+
       it('throws when the AST includes invalid literal types', function() {
         const tree = jsep('"bar" + true / 16');
         expect(

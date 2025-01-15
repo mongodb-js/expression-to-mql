@@ -10,11 +10,13 @@ describe('Traverse AST', function() {
         Array.from(traverseAST(null, { traversalMode: 'foofix' }))
       ).to.throw(/Invalid traversal mode/);
     });
+
     TRAVERSAL_MODES.forEach(mode => {
       it(`accepts traversal mode ${mode}`, function() {
         expect(() => Array.from(traverseAST(null, mode))).to.not.throw();
       });
     });
+
     it('traverses a simple binary expression in prefix mode', function() {
       const tree = jsep('foo + bar');
       const result = Array.from(traverseAST(tree, { traversalMode: 'prefix' }));
@@ -29,6 +31,7 @@ describe('Traverse AST', function() {
         'Identifier'
       ]);
     });
+
     it('traverses a simple binary expression in infix mode', function() {
       const tree = jsep('foo + bar');
       const result = Array.from(traverseAST(tree));
@@ -43,6 +46,7 @@ describe('Traverse AST', function() {
         'Identifier'
       ]);
     });
+
     it('traverses a simple binary expression in postfix mode', function() {
       const tree = jsep('foo + bar');
       const result = Array.from(
@@ -60,6 +64,7 @@ describe('Traverse AST', function() {
       ]);
     });
   });
+
   describe('error handling', function() {
     it('throws an error if a node does not have a type', function() {
       const brokenTree = {
@@ -71,6 +76,7 @@ describe('Traverse AST', function() {
       );
     });
   });
+
   describe('null / empty trees', function() {
     it('does not yield any values for a null tree', function() {
       const result = Array.from(traverseAST(null));
@@ -78,6 +84,7 @@ describe('Traverse AST', function() {
         .to.be.an('array')
         .with.lengthOf(0);
     });
+
     it('does not yield any values for a tree from an empty string', function() {
       const tree = jsep('');
       const result = Array.from(traverseAST(tree));
@@ -86,6 +93,7 @@ describe('Traverse AST', function() {
         .with.lengthOf(0);
     });
   });
+
   describe('BinaryExpression', function() {
     it('traverses the left and right children', function() {
       const tree = jsep('1 + 2');
@@ -98,6 +106,7 @@ describe('Traverse AST', function() {
       expect(types).to.deep.equal(['Literal', 'BinaryExpression', 'Literal']);
     });
   });
+
   describe('UnaryExpression', function() {
     it('traverses the argument child', function() {
       const tree = jsep('-1');
@@ -110,12 +119,14 @@ describe('Traverse AST', function() {
       expect(types).to.deep.equal(['UnaryExpression', 'Literal']);
     });
   });
+
   describe('collapse MemberExpression nodes to a single Identifier', function() {
     it('collapses a one-level member node correctly', function() {
       const tree = jsep('foo.bar');
       const result = Array.from(traverseAST(tree));
       expect(result[0]).to.include({ type: 'Identifier', name: 'foo.bar' });
     });
+
     it('collapses a multi-level member nodes correctly', function() {
       const tree = jsep('foo.bar.baz.boom');
       const result = Array.from(traverseAST(tree));
@@ -127,6 +138,7 @@ describe('Traverse AST', function() {
         name: 'foo.bar.baz.boom'
       });
     });
+
     it('works inside an expression', function() {
       const tree = jsep('foo.bar + baz.boom');
       const result = Array.from(traverseAST(tree));
